@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import java.util.TimeZone;
 
-class TimeHandler extends Handler {
+public class TimeHandler extends Handler {
     private static int MESSAGE_UPDATE_TIME = 0;
     private static TimeTicker timeTicker;
     private TimeZone timeZone = TimeZone.getDefault();

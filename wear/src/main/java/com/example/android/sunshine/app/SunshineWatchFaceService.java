@@ -11,30 +11,32 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.SurfaceHolder;
 
 import com.example.android.sunshine.app.face.OnDrawListener;
-import com.example.android.sunshine.app.face.SunshineWatchFaceStyleBuilder;
+import com.example.android.sunshine.app.face.WatchFaceStyleBuilder;
 import com.example.android.sunshine.app.face.WatchFace;
 import com.example.android.sunshine.app.sync.WeatherInformationListener;
 import com.example.android.sunshine.app.sync.ConnectionCallbacks;
 import com.example.android.sunshine.app.timer.Time;
+import com.example.android.sunshine.app.timer.TimeHandler;
 import com.example.android.sunshine.app.timer.TimeTicker;
-import com.example.android.sunshine.app.timer.Timer;
 
 import java.util.TimeZone;
 
 public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
+    private static final Integer UPDATE_INTERVAL_IN_MILLISECONDS = 500;
+
     // SunshineWatchFaceService knows about the mechanism used in order to render the Android Wear Watch Face
 
     @Override
     public Engine onCreateEngine() {
-        return new SunshineWatchFaceEngine();
+        return new WatchFaceEngine();
     }
 
-    public class SunshineWatchFaceEngine extends CanvasWatchFaceService.Engine implements
+    public class WatchFaceEngine extends CanvasWatchFaceService.Engine implements
             TimeTicker,
             WeatherInformationListener, OnDrawListener {
 
-        // SunshineWatchFaceEngine provides a basis of interaction between the Android Wear Watch Face
+        // WatchFaceEngine provides a basis of interaction between the Android Wear Watch Face
         // and the Handheld App
 
         private boolean hasRegisteredTimeZoneChangedReceiver;
@@ -42,31 +44,32 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         private Double high = Double.NaN;
         private Double low = Double.NaN;
         private Bitmap weatherIcon;
-        private Timer timer;
+
+        private  TimeHandler timeHandler;
         private ConnectionCallbacks connectionCallbacks;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
-            timer = new Timer(this);
+            timeHandler = TimeHandler.getInstance(UPDATE_INTERVAL_IN_MILLISECONDS, this);
             timeZoneReceiver = new TimeZoneReceiver();
             connectionCallbacks = ConnectionCallbacks.initialize(getApplicationContext(), this);
             connectionCallbacks.performSync();
-            setWatchFaceStyle(new SunshineWatchFaceStyleBuilder(SunshineWatchFaceService.this).build());
+            setWatchFaceStyle(new WatchFaceStyleBuilder(SunshineWatchFaceService.this).build());
         }
 
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
             invalidate();
-            timer.update();
+            timeHandler.update();
             connectionCallbacks.performSync();
         }
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             super.onDraw(canvas, bounds);
-            Time time = timer.getTime();
+            Time time = timeHandler.getTime();
             new WatchFace(canvas, getApplicationContext(), this).show(time, low, high, weatherIcon, isInAmbientMode());
         }
 
@@ -81,7 +84,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
             if (visible) {
                 registerTimeZoneChangedReceiver();
-                timer.update();
+                timeHandler.update();
                 connectionCallbacks.performSync();
             } else
                 unregisterTimeZoneChangedReceiver();
@@ -138,7 +141,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                timer.updateTimeZone(TimeZone.getDefault());
+                timeHandler.updateTimeZone(TimeZone.getDefault());
                 invalidate();
             }
         }

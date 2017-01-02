@@ -1,5 +1,5 @@
 package com.example.android.sunshine.app.face;
 
-public interface OnDrawListener {
+public abstract interface OnDrawListener {
     void onDrawSuccess();
 }

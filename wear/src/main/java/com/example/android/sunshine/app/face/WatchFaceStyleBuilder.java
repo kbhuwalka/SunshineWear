@@ -4,11 +4,11 @@ import android.app.Service;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.view.Gravity;
 
-//  SunshineWatchFaceStyleBuilder sets the miscellaneous watch face style options for
+//  WatchFaceStyleBuilder sets the miscellaneous watch face style options for
 //  Sunshine Watch Face
 
-public class SunshineWatchFaceStyleBuilder extends WatchFaceStyle.Builder {
-    public SunshineWatchFaceStyleBuilder(Service service) {
+public class WatchFaceStyleBuilder extends WatchFaceStyle.Builder {
+    public WatchFaceStyleBuilder(Service service) {
         super(service);
     }
 
