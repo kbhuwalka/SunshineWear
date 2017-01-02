@@ -98,6 +98,7 @@ public class SunshineDataListener implements DataApi.DataListener {
                     weatherInformationListener.onWeatherInformationFetchFailure();
                     return;
                 }
+                fetchedWeatherIcon = Bitmap.createScaledBitmap(fetchedWeatherIcon, 40, 40, false);
                 weatherInformationListener.onWeatherIconFetchSuccess(fetchedWeatherIcon);
             }
         });
